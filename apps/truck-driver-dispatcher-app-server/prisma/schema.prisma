@@ -1,0 +1,147 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  createdAt DateTime       @default(now())
+  email     String?
+  id        String         @id @default(cuid())
+  name      String?
+  phone     String?
+  role      EnumAdminRole?
+  updatedAt DateTime       @updatedAt
+}
+
+model Driver {
+  complianceDocuments ComplianceDocument[]
+  createdAt           DateTime             @default(now())
+  email               String?
+  firstName           String?
+  id                  String               @id @default(cuid())
+  insurance           String?
+  itinerary           Json?
+  lastName            String?
+  licenseNumber       String?
+  loadOffers          LoadOffer[]
+  messages            Message[]
+  notifications       Notification[]
+  payments            Payment[]
+  phone               String?
+  updatedAt           DateTime             @updatedAt
+}
+
+model LoadOffer {
+  amount       Float?
+  createdAt    DateTime             @default(now())
+  description  String?
+  dispatcher   Dispatcher?          @relation(fields: [dispatcherId], references: [id])
+  dispatcherId String?
+  driver       Driver?              @relation(fields: [driverId], references: [id])
+  driverId     String?
+  id           String               @id @default(cuid())
+  status       EnumLoadOfferStatus?
+  updatedAt    DateTime             @updatedAt
+}
+
+model Payment {
+  amount       Float?
+  createdAt    DateTime           @default(now())
+  dispatcher   Dispatcher?        @relation(fields: [dispatcherId], references: [id])
+  dispatcherId String?
+  driver       Driver?            @relation(fields: [driverId], references: [id])
+  driverId     String?
+  escrow       Boolean?
+  id           String             @id @default(cuid())
+  status       EnumPaymentStatus?
+  updatedAt    DateTime           @updatedAt
+}
+
+model ComplianceDocument {
+  createdAt    DateTime                            @default(now())
+  dispatcher   Dispatcher?                         @relation(fields: [dispatcherId], references: [id])
+  dispatcherId String?
+  documentType EnumComplianceDocumentDocumentType?
+  documentUrl  Json?
+  driver       Driver?                             @relation(fields: [driverId], references: [id])
+  driverId     String?
+  id           String                              @id @default(cuid())
+  updatedAt    DateTime                            @updatedAt
+  verified     Boolean?
+}
+
+model Message {
+  content      String?
+  createdAt    DateTime    @default(now())
+  dispatcher   Dispatcher? @relation(fields: [dispatcherId], references: [id])
+  dispatcherId String?
+  driver       Driver?     @relation(fields: [driverId], references: [id])
+  driverId     String?
+  id           String      @id @default(cuid())
+  timestamp    DateTime?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Dispatcher {
+  complianceDocuments ComplianceDocument[]
+  createdAt           DateTime             @default(now())
+  email               String?
+  id                  String               @id @default(cuid())
+  loadOffers          LoadOffer[]
+  messages            Message[]
+  name                String?
+  nationalId          String?
+  notifications       Notification[]
+  payments            Payment[]
+  phone               String?
+  updatedAt           DateTime             @updatedAt
+}
+
+model Notification {
+  createdAt    DateTime                   @default(now())
+  dispatcher   Dispatcher?                @relation(fields: [dispatcherId], references: [id])
+  dispatcherId String?
+  driver       Driver?                    @relation(fields: [driverId], references: [id])
+  driverId     String?
+  id           String                     @id @default(cuid())
+  message      String?
+  sentAt       DateTime?
+  typeField    EnumNotificationTypeField?
+  updatedAt    DateTime                   @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumAdminRole {
+  Option1
+}
+
+enum EnumLoadOfferStatus {
+  Option1
+}
+
+enum EnumPaymentStatus {
+  Option1
+}
+
+enum EnumComplianceDocumentDocumentType {
+  Option1
+}
+
+enum EnumNotificationTypeField {
+  Option1
+}
